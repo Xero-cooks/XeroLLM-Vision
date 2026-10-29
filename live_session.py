@@ -2,7 +2,7 @@
 No keep-alive/anti-idle tricks, no public admin routes, no indefinite uptime claim.
 """
 from __future__ import annotations
-import base64,contextlib,hashlib,importlib.metadata,json,os,pathlib,re,subprocess,sys,time,urllib.request
+import base64,contextlib,hashlib,importlib.metadata,json,os,pathlib,re,shutil,subprocess,sys,time,urllib.request
 
 def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
     def report(phase:str,**fields):
@@ -13,6 +13,14 @@ def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
     root=pathlib.Path.cwd();processes=[];logs=[]
     os.environ.update(PYTHONUNBUFFERED='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1')
     try:
+        # Optional trusted, private validation output supplies compatible model/engine caches.
+        for receipt in pathlib.Path('/kaggle/input').rglob('assets.json'):
+            source=receipt.parent
+            if source.name!='models':continue
+            candidates=[p for p in source.rglob('*') if p.is_file()]
+            if len(candidates)>2000 or sum(p.stat().st_size for p in candidates)>2_000_000_000:continue
+            shutil.copytree(source,root/'models',dirs_exist_ok=True)
+            report('model_cache_restored',cached_file_count=len(candidates));break
         report('installing_dependencies')
         with open('install.log','w') as log:
             def pip(*args,timeout=900):subprocess.run([sys.executable,'-m','pip',*args],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=timeout)
@@ -36,7 +44,8 @@ def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
         gateway=spawn([sys.executable,'-m','uvicorn','gateway_server:app','--host','127.0.0.1','--port','8000','--workers','1','--no-access-log'],'gateway.log',env)
         import httpx
         auth={'Authorization':'Bearer '+runtime['gateway_token']}
-        with httpx.Client(timeout=120,trust_env=False) as client:
+        from cloudflare_transport import CloudflareDNSTransport
+        with httpx.Client(timeout=120,trust_env=False,transport=CloudflareDNSTransport()) as client:
             deadline=time.time()+1800
             while time.time()<deadline:
                 if gateway.poll() is not None:raise RuntimeError('gateway_startup_failed')

@@ -39,3 +39,18 @@ def test_key_dataclass_repr_does_not_reveal_secrets():
     from config import Settings
     assert 'hidden-provider-secret' not in repr(KeyState('hidden-provider-secret'))
     assert 'hidden-provider-secret' not in repr(Settings(keys=['hidden-provider-secret'],gateway_token='private-client-token',admin_token='private-admin-token'))
+
+def test_quick_tunnel_transport_pins_public_ip_and_preserves_tls_hostname(monkeypatch):
+    from cloudflare_transport import CloudflareDNSTransport
+    seen=[]
+    monkeypatch.setattr('cloudflare_transport.public_ipv4',lambda host:['104.16.230.132'])
+    def handle(self,request):seen.append(request);return httpx.Response(200,content=b'ok')
+    monkeypatch.setattr(httpx.HTTPTransport,'handle_request',handle)
+    with httpx.Client(transport=CloudflareDNSTransport()) as c:assert c.get('https://unit-session.trycloudflare.com/health').status_code==200
+    assert seen[0].url.host=='104.16.230.132' and seen[0].headers['host']=='unit-session.trycloudflare.com'
+    assert seen[0].extensions['sni_hostname']=='unit-session.trycloudflare.com'
+
+def test_private_live_metadata_can_use_validated_kernel_cache(tmp_path):
+    from deploy_live import prepare_live
+    j=prepare_live('testowner',tmp_path,'https://unit-broker.trycloudflare.com','x'*40,{'url':'https://example.com/client','sha256':'0'*64},300,'testowner/validation-cache')
+    assert j['kernel_sources']==['testowner/validation-cache'] and j['is_private']

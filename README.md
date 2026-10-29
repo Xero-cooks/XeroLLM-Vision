@@ -99,7 +99,7 @@ The Python 3.13 candidate stack uses ORT-GPU 1.22, torch 2.7.1 / torchvision 0.2
 
 ## Validation status
 
-- **66 local unit/contract tests pass** for the current repository. Earlier GPU validation snapshots passed 51 remote tests; live deployment runs its own bundled contract suite before startup.
+- **70 local unit/contract tests pass** for the current repository. Earlier GPU validation snapshots passed 51 remote tests; live deployment runs its own bundled contract suite before startup.
 - Actual CPU OCR baseline: **902.58 ms p50**, **989.15 ms p95**, 20 uncached synthetic-frame measurements. Not a GPU result.
 - Terminal CTC ArgMax/ReduceMax matched the original recognizer's IDs and scores in a CPU numerical equivalence test.
 - Actual dual-T4 TensorRT configuration: **29.03 ms warm p50 / 31.13 ms p95**,20 uncached synthetic measurements; cold preparation/warmup **722.76 seconds**, first encoded frame **1397.58 ms**. Three cached engines were observed.

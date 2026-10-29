@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 from deploy_kaggle import FILES
 ROOT=pathlib.Path(__file__).parent
 
-def prepare_live(owner:str,out:pathlib.Path,broker_url:str,ticket:str,cloudflared:dict,session_seconds:int=3600)->dict:
+def prepare_live(owner:str,out:pathlib.Path,broker_url:str,ticket:str,cloudflared:dict,session_seconds:int=3600,cache_kernel:str|None=None)->dict:
     u=urlsplit(broker_url)
     if u.scheme!='https' or not (u.hostname or '').endswith('.trycloudflare.com') or u.username or u.password or u.path not in ('','/'):raise ValueError('use the authenticated HTTPS enrollment broker')
     if not 32<=len(ticket)<=256:raise ValueError('invalid bootstrap ticket')
@@ -33,9 +33,9 @@ run(runtime,BROKER,DURATION,CLOUDFLARED)
     import re
     script=re.sub(r'\b(PAYLOAD|SHA|BROKER|TICKET|DURATION|CLOUDFLARED)\b',lambda m:values[m[0]],script)
     p=out/'live_bootstrap.py';p.write_text(script);p.chmod(0o600)
-    meta={'id':owner+'/mercury3-vision-gateway-live-session','title':'Mercury3 Vision Gateway Live Session','code_file':'live_bootstrap.py','language':'python','kernel_type':'script','is_private':True,'enable_gpu':True,'enable_internet':True,'machine_shape':'NvidiaTeslaT4','dataset_sources':[],'competition_sources':[],'kernel_sources':[]}
+    meta={'id':owner+'/mercury3-vision-gateway-live-session','title':'Mercury3 Vision Gateway Live Session','code_file':'live_bootstrap.py','language':'python','kernel_type':'script','is_private':True,'enable_gpu':True,'enable_internet':True,'machine_shape':'NvidiaTeslaT4','dataset_sources':[],'competition_sources':[],'kernel_sources':[cache_kernel] if cache_kernel else []}
     (out/'kernel-metadata.json').write_text(json.dumps(meta,indent=2));return meta
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--owner',required=True);p.add_argument('--out',required=True);p.add_argument('--broker-url',required=True);p.add_argument('--ticket-file',required=True);p.add_argument('--cloudflared-manifest',required=True);p.add_argument('--session-seconds',type=int,default=3600);a=p.parse_args()
-    print(json.dumps(prepare_live(a.owner,pathlib.Path(a.out),a.broker_url,pathlib.Path(a.ticket_file).read_text().strip(),json.loads(pathlib.Path(a.cloudflared_manifest).read_text()),a.session_seconds)))
+    p=argparse.ArgumentParser();p.add_argument('--owner',required=True);p.add_argument('--out',required=True);p.add_argument('--broker-url',required=True);p.add_argument('--ticket-file',required=True);p.add_argument('--cloudflared-manifest',required=True);p.add_argument('--session-seconds',type=int,default=3600);p.add_argument('--cache-kernel');a=p.parse_args()
+    print(json.dumps(prepare_live(a.owner,pathlib.Path(a.out),a.broker_url,pathlib.Path(a.ticket_file).read_text().strip(),json.loads(pathlib.Path(a.cloudflared_manifest).read_text()),a.session_seconds,a.cache_kernel)))

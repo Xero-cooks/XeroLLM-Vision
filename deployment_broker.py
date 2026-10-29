@@ -33,7 +33,7 @@ def create_broker(config_path:str)->FastAPI:
     @app.post('/report')
     async def report(request:Request):
         auth(request,cfg['report_token']);j=await bounded(request)
-        allowed={'phase','public_url','backend','gpu_count','session_end_unix','error_code','provider_real_keys','upstream_attempts','completion_tokens'}
+        allowed={'phase','public_url','backend','gpu_count','session_end_unix','error_code','provider_real_keys','upstream_attempts','completion_tokens','cached_file_count'}
         clean={k:v for k,v in j.items() if k in allowed and isinstance(v,(str,int,float,bool))}
         if any(isinstance(v,str) and len(v)>300 for v in clean.values()):raise HTTPException(400,'field too long')
         if 'public_url' in clean:

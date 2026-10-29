@@ -38,8 +38,11 @@ python deploy_live.py \
   --broker-url https://YOUR-BROKER.trycloudflare.com \
   --ticket-file /secure/private/bootstrap-ticket \
   --cloudflared-manifest deploy/cloudflared-manifest.json \
-  --session-seconds 3600
+  --session-seconds 3600 \
+  --cache-kernel YOUR_KAGGLE_USER/YOUR_COMPLETED_VALIDATION_KERNEL
 ```
+
+`--cache-kernel` is optional. It attaches your own completed validation output, allowing the runner to restore compatible model/TensorRT caches rather than rebuild them. Never load untrusted serialized engine caches. Regenerate caches when model, runtime, GPU architecture or build settings change.
 
 Submit the generated directory with the official Kaggle client, requesting two T4s and enough **bounded** runtime for setup plus serving. The metadata is private. Never push the generated directory to GitHub. Keep the controller alive through enrollment/readiness; after credentials and service startup, serving does not depend on the controller remaining online.
 
@@ -60,3 +63,20 @@ Use ordinary chat-completions tool schemas and JSON/SSE clients. Send JPEG `imag
 Keep the client token in a secret manager or private connection file. Never put provider keys in an agent's public config. The administrator token is different and should not be distributed with agent configuration. Public ingress blocks admin hot-reload routes; update from the trusted host/network or provision a new private session.
 
 When the session ends, the quick-tunnel URL stops working. A new session gets a new URL and credentials. For stable production use, deploy the same application on a persistent supervised GPU host and a properly authenticated named tunnel/domain.
+
+## PNG-producing agents
+
+The strict GPU server accepts JPEG. If an agent produces PNG/WebP data URLs, convert them on the **agent computer**, not on the Kaggle inference CPU path. `agent_client.normalize_messages` handles this while preserving message/tool history. The optional OpenAI SDK wrapper loads the private connection file and disables extra client retries to avoid stacking retries on top of the gateway policy:
+
+```python
+# Agent-side dependency: pip install openai
+from agent_client import GatewayAgentClient
+client = GatewayAgentClient('/secure/private/gateway-agent.json')
+result = client.create(messages=your_messages, stream=False)
+```
+
+Any standard OpenAI client can connect directly if it already emits JPEG. This helper does not fetch remote image URLs; remote URL handling remains explicitly opt-in at the server. Image conversion adds client-side work and is not included in the reported GPU OCR-stage timer.
+
+## Fresh tunnel DNS
+
+Some sandbox resolvers briefly cache NXDOMAIN for a newly issued quick-tunnel hostname. `cloudflare_transport.py` resolves these hostnames through HTTPS DNS, pins only global IP addresses, and preserves the original Host and TLS SNI/hostname verification. Certificate verification is **not** disabled. Live self-checks and the optional agent wrapper use this transport; ordinary clients can use their normal resolver once propagation settles.

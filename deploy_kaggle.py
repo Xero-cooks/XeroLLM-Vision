@@ -3,7 +3,7 @@ No provider keys or local gateway credentials are embedded. Review outputs, not 
 """
 import argparse,base64,hashlib,io,json,pathlib,zipfile
 ROOT=pathlib.Path(__file__).parent
-FILES=['deploy_live.py','live_session.py','public_edge.py','deployment_broker.py','deploy_kaggle.py','verify_quality.py','runtime_env.py','ctc_graph.py','config.py','api_pool.py','gpu_ocr_engine.py','ui_delta_cache.py','spatial_serializer.py','payload_transformer.py','gateway_server.py','model_assets.py','encoder_protocol.py','benchmark_700toks.py','doctor.py','smoke_test.py','requirements.txt','pytest.ini']
+FILES=['cloudflare_transport.py','agent_client.py','deploy_live.py','live_session.py','public_edge.py','deployment_broker.py','deploy_kaggle.py','verify_quality.py','runtime_env.py','ctc_graph.py','config.py','api_pool.py','gpu_ocr_engine.py','ui_delta_cache.py','spatial_serializer.py','payload_transformer.py','gateway_server.py','model_assets.py','encoder_protocol.py','benchmark_700toks.py','doctor.py','smoke_test.py','requirements.txt','pytest.ini']
 def prepare(owner:str,out:pathlib.Path):
     out.mkdir(parents=True,exist_ok=True);buffer=io.BytesIO()
     with zipfile.ZipFile(buffer,'w',zipfile.ZIP_DEFLATED) as z:
