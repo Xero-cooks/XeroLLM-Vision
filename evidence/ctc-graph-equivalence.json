@@ -1,0 +1,23 @@
+{
+  "kind": "REAL_PP_OCR_V4_RECOGNIZER_GRAPH_EQUIVALENCE_CPU_ONLY",
+  "input_shape": [
+    2,
+    3,
+    48,
+    160
+  ],
+  "full_output_shape": [
+    2,
+    20,
+    6625
+  ],
+  "reduced_output_shape": [
+    2,
+    20
+  ],
+  "ids_exact": true,
+  "scores_max_abs_difference": 0.0,
+  "full_output_bytes": 1060000,
+  "reduced_output_bytes": 480,
+  "GPU_latency_and_TensorRT_graph_support": "UNVERIFIED"
+}

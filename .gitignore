@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+models/
+.assets/
+trt_cache*/
+.local-auth.json
+.server-pid
+.env
+*.sqlite3
+kaggle_preflight.py
+kaggle-*.log
+*-install.log
+.local*

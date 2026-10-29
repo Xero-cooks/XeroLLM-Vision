@@ -1,0 +1,14 @@
+name: CPU contract tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements-staging.txt onnxruntime==1.22.0 onnx==1.18.0 numpy==2.2.6 Pillow==11.0.0 opencv-python-headless==4.10.0.84
+      - run: python -m pytest -q tests

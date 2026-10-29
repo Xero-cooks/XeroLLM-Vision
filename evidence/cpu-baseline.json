@@ -1,0 +1,109 @@
+{
+  "kind": "MEASURED_REAL_OCR_WITH_PROJECTED_NOT_LIVE_PROVIDER_THROUGHPUT",
+  "backend": "cpu_staging",
+  "environment": {
+    "backend": "cpu_staging",
+    "warmed": true,
+    "detector_providers": [
+      "CPUExecutionProvider"
+    ],
+    "recognizer_providers": [
+      [
+        "CPUExecutionProvider"
+      ],
+      [
+        "CPUExecutionProvider"
+      ]
+    ],
+    "precision": "TensorRT FP16 enabled when available; model I/O dtype preserved",
+    "gpu_count": 0,
+    "gpu": [],
+    "partial_cache_policy": "full detection; exact unchanged tile/crop recognition reuse; GPU uses exact tiled equality, no collision risk",
+    "engine_cache_files": []
+  },
+  "startup_engine_warmup_ms": 2698.3571980000534,
+  "first_frame_ocr_ms": 915.6038799999351,
+  "warm_uncached_ocr_ms": {
+    "p50": 902.5780565000332,
+    "p95": 989.1505219999317,
+    "samples": [
+      937.7355420000413,
+      912.9595660000405,
+      890.2138440000726,
+      889.9490140000808,
+      881.591923999963,
+      856.0020499999155,
+      894.0291080000407,
+      917.4620940000295,
+      900.8423970000194,
+      943.2180449999805,
+      881.9364739999855,
+      904.313716000047,
+      863.3423370000628,
+      886.6041139999652,
+      1060.993291999921,
+      879.4125599999916,
+      989.1505219999317,
+      957.9127350000363,
+      952.0627010000453,
+      918.0696700000226
+    ]
+  },
+  "changed_frame_sequence_ms": [
+    843.136207999919,
+    865.7842249999703,
+    944.4173389999833,
+    831.8143809999583,
+    877.3743520000608
+  ],
+  "exact_repeat_cache_ms": {
+    "p50": 0.10148899991690996
+  },
+  "recognized_element_counts": [
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31
+  ],
+  "sample_text": [
+    "Healthy",
+    "Service 2",
+    "Healthy",
+    "Healthy",
+    "Logs",
+    "Service 4",
+    "Healthy",
+    "Settings",
+    "Healthy",
+    "Service 6",
+    "Healthy",
+    "Healthy"
+  ],
+  "quality_gate_minimum_5_elements": true,
+  "assumed_http_and_other_overhead_ms": 18.0,
+  "assumed_vendor_generation_tokens_per_second": 1068,
+  "projected_paired_tokens_per_second": {
+    "250": 216.51,
+    "500": 360.04,
+    "1000": 538.53
+  },
+  "projected_700_target_met": false,
+  "actual_live_provider_throughput_verified": false,
+  "dual_T4_latency_target_verified": false
+}

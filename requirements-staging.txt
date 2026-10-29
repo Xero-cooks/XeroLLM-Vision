@@ -1,0 +1,6 @@
+fastapi==0.115.6
+uvicorn==0.34.0
+httpx[http2]==0.28.1
+pytest==8.3.4
+pytest-asyncio==0.25.0
+# CPU ONNX Runtime, numpy, Pillow, OpenCV must be available. Tested runtime recorded in evidence.
