@@ -80,3 +80,7 @@ Any standard OpenAI client can connect directly if it already emits JPEG. This h
 ## Fresh tunnel DNS
 
 Some sandbox resolvers briefly cache NXDOMAIN for a newly issued quick-tunnel hostname. `cloudflare_transport.py` resolves these hostnames through HTTPS DNS, pins only global IP addresses, and preserves the original Host and TLS SNI/hostname verification. Certificate verification is **not** disabled. Live self-checks and the optional agent wrapper use this transport; ordinary clients can use their normal resolver once propagation settles.
+
+## Recorded live verification
+
+[Sanitized live evidence](../evidence/live-gateway-validation.json) records real public image-to-Mercury JSON and SSE, tool-call compatibility, three-key usage, authentication and blocked admin routes. The optional OpenAI SDK wrapper also passed with a PNG screenshot converted client-side. This is one bounded serving session, not an always-on SLA or a 700 tokens/s benchmark. No endpoint credentials or private notebook identifiers are included.

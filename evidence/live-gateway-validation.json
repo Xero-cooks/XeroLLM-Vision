@@ -1,0 +1,49 @@
+{
+  "models": true,
+  "gpu_count": 2,
+  "provider_real_keys": 3,
+  "detector_providers": [
+    "TensorrtExecutionProvider",
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "recognizer_providers": [
+    [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ]
+  ],
+  "engine_cache_count": 3,
+  "precision": "TensorRT FP16 requested; model I/O dtype preserved",
+  "unauthorized_rejected": true,
+  "public_admin_blocked": true,
+  "ocr_elements": 31,
+  "ocr_stage_latency_ms": 93.41155399999934,
+  "ocr_markdown_present": true,
+  "image_chat_wall_ms": 608.82,
+  "real_json": true,
+  "json_completion_tokens": 11,
+  "telemetry_headers_present": true,
+  "real_sse_not_simulated": true,
+  "real_sse": true,
+  "agent_tool_call": true,
+  "key_request_counts": [
+    2,
+    2,
+    1
+  ],
+  "round_robin_all_three_observed": true,
+  "verified_at": "2026-10-29T16:47:44.360143+00:00",
+  "local_contract_tests_passed": 71,
+  "live_700_tokens_per_second_verified": false,
+  "openai_sdk_agent_png_adapter": true,
+  "openai_sdk_version": "2.6.1",
+  "scope": "Single session-limited public ingress verification using synthetic UI screenshots. Not a throughput distribution or production reliability test.",
+  "provider_keys_excluded": true
+}

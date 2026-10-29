@@ -103,8 +103,9 @@ The Python 3.13 candidate stack uses ORT-GPU 1.22, torch 2.7.1 / torchvision 0.2
 - Actual CPU OCR baseline: **902.58 ms p50**, **989.15 ms p95**, 20 uncached synthetic-frame measurements. Not a GPU result.
 - Terminal CTC ArgMax/ReduceMax matched the original recognizer's IDs and scores in a CPU numerical equivalence test.
 - Actual dual-T4 TensorRT configuration: **29.03 ms warm p50 / 31.13 ms p95**,20 uncached synthetic measurements; cold preparation/warmup **722.76 seconds**, first encoded frame **1397.58 ms**. Three cached engines were observed.
-- Real GPU HTTP OCR and mocked JSON/SSE checks passed using **CUDA-only** sessions; TensorRT-specific HTTP smoke remains separate work.
-- **Live Mercury paired throughput, stable public hosting and production readiness remain unverified.**
+- A subsequent session-limited public gateway passed real image OCR, live Mercury JSON/SSE, tool-call forwarding, authentication/admin isolation, and the OpenAI SDK PNG-to-JPEG adapter. Both GPU recognizers and the detector listed TensorRT/CUDA providers, with three cached engines. All three provider keys were exercised. See [live verification evidence](evidence/live-gateway-validation.json).
+- That external smoke sample observed **93.41 ms OCR-stage latency** and **608.82 ms client wall time for an 11-token completion**. These are individual checks, not p50 measurements or ≥700 tokens/s proof.
+- **Live Mercury ≥700 paired tokens/s, stable always-on hosting and production readiness remain unverified.**
 
 See [benchmark methodology](docs/BENCHMARKING.md) and [sanitized evidence](evidence/validation-status.json). Historical measurements must not be interpreted as results for every subsequent commit.
 
