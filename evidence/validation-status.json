@@ -27,5 +27,6 @@
   "TensorRT_engine_preparation_and_warmup_ms": 722756.8373070001,
   "last_completed_CUDA_stage": "real dual-GPU benchmark, synthetic label check, authenticated HTTP OCR and mock JSON/SSE smoke",
   "GPU_numeric_check": "independent sorted-sample p50 and nearest-rank p95 recomputed; matched benchmark reports",
-  "TensorRT_quality_limit": "nonempty recognized elements/sample text observed; full labeled quality check and HTTP smoke in this run used CUDA-only, not TensorRT"
+  "TensorRT_quality_limit": "nonempty recognized elements/sample text observed; full labeled quality check and HTTP smoke in this run used CUDA-only, not TensorRT",
+  "latency_scope": "Reported OCR stage only; final Markdown serialization and API/client wall time are outside this timer. Full encoder/API budget still needs wall-clock verification."
 }

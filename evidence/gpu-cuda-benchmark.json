@@ -130,5 +130,6 @@
   "actual_live_provider_throughput_verified": false,
   "dual_T4_latency_target_verified": false,
   "source_archive_sha256": "74cbbda0d098a0f5d33ad31c1da317f1243d2dd4ec0fe25878238b3153f39e38",
-  "validation_scope": "20 warm uncached synthetic frames sharing one layout; no real provider call; TensorRT engine flag is not per-operator precision proof"
+  "validation_scope": "20 warm uncached synthetic frames sharing one layout; no real provider call; TensorRT engine flag is not per-operator precision proof",
+  "timing_boundary": "Reported engine OCR timer includes decode/preprocessing/detection/recognition/cache handling and synchronization; stops before final spatial Markdown serialization. Not complete API or client wall time."
 }

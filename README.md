@@ -4,7 +4,7 @@
 
 Send a screenshot using a standard OpenAI `image_url` message. The gateway reads visible text, attaches bounding boxes and normalized coordinates, converts the observation to compact spatial Markdown, then forwards a text-only request to Inception's Mercury 3 API.
 
-> **Experimental.** This is an independent open-source project, not an Inception Labs product. A dual-T4 TensorRT FP16 configuration measured **29.03 ms p50 / 31.13 ms p95** on 20 warm uncached synthetic-frame requests. The ≥700 end-to-end tokens/s goal is **not a demonstrated live-provider result**. Model decode speed, mock responses and projected throughput are not live benchmarks.
+> **Experimental.** This is an independent open-source project, not an Inception Labs product. A dual-T4 TensorRT FP16 configuration measured **29.03 ms p50 / 31.13 ms p95** on 20 warm uncached synthetic-frame requests using the reported OCR-stage timer (before final Markdown serialization). The ≥700 end-to-end tokens/s goal is **not a demonstrated live-provider result**. Model decode speed, mock responses and projected throughput are not live benchmarks.
 
 ## What it does
 

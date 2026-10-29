@@ -12,6 +12,8 @@ The encoder benchmark generates five 1920×1080 synthetic frames sharing a text-
 
 ## Keep the clocks separate
 
+**Current timer boundary:** the recorded engine OCR timer stops before final spatial Markdown serialization. It includes image decode, preprocessing, detection, recognition, cache handling and synchronization. The reported 29.03 ms therefore is an OCR-stage result, not a measured complete image-to-Markdown or API response time. Future complete-encoder validation should wrap `engine.encode()` with an outer wall clock.
+
 - Cold dependency/model/engine preparation is not warm image-encoding latency.
 - Uncached encoding, changed-frame caching and exact-repeat hits are separate populations.
 - The assumed 1068 tok/s vendor baseline and 18 ms extra overhead are **projection inputs**, not measured upstream behavior.
