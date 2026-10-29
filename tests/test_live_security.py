@@ -54,3 +54,13 @@ def test_private_live_metadata_can_use_validated_kernel_cache(tmp_path):
     from deploy_live import prepare_live
     j=prepare_live('testowner',tmp_path,'https://unit-broker.trycloudflare.com','x'*40,{'url':'https://example.com/client','sha256':'0'*64},300,'testowner/validation-cache')
     assert j['kernel_sources']==['testowner/validation-cache'] and j['is_private']
+
+def test_unpropagated_quick_tunnel_dns_is_retryable(monkeypatch):
+    import pytest
+    from cloudflare_transport import public_ipv4
+    class DNSResponse:
+        def __enter__(self):return self
+        def __exit__(self,*args):pass
+        def read(self,*args):return b'{"Status":3}'
+    monkeypatch.setattr('cloudflare_transport.urllib.request.urlopen',lambda *args,**kwargs:DNSResponse())
+    with pytest.raises(httpx.ConnectError,match='not propagated'):public_ipv4('new-unit-session.trycloudflare.com')

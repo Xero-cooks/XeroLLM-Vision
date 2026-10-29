@@ -72,8 +72,9 @@ def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
                 time.sleep(1)
             else:raise RuntimeError('public_ingress_startup_failed')
             tunnel=spawn([str(binary),'tunnel','--no-autoupdate','--protocol','http2','--url','http://127.0.0.1:8080'],'tunnel.log',os.environ.copy())
-            public_url=None
+            public_url=None;public_deadline=time.time()+240
             for _ in range(90):
+                if time.time()>public_deadline:raise RuntimeError('public_dns_readiness_timeout')
                 if tunnel.poll() is not None:raise RuntimeError('tunnel_startup_failed')
                 match=re.search(r'https://[a-z0-9-]+\.trycloudflare\.com',(root/'tunnel.log').read_text())
                 if match:
