@@ -1,0 +1,141 @@
+{
+  "kind": "MEASURED_REAL_OCR_WITH_PROJECTED_NOT_LIVE_PROVIDER_THROUGHPUT",
+  "backend": "dual_cuda",
+  "environment": {
+    "backend": "dual_cuda",
+    "warmed": true,
+    "detector_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "recognizer_providers": [
+      [
+        "TensorrtExecutionProvider",
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      [
+        "TensorrtExecutionProvider",
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ]
+    ],
+    "precision": "TensorRT FP16 requested; model I/O dtype preserved",
+    "gpu_count": 2,
+    "gpu": [
+      {
+        "id": 0,
+        "name": "Tesla T4",
+        "allocated_bytes": 6220800,
+        "free_total_bytes": [
+          14970322944,
+          15636037632
+        ]
+      },
+      {
+        "id": 1,
+        "name": "Tesla T4",
+        "allocated_bytes": 0,
+        "free_total_bytes": [
+          15123415040,
+          15636037632
+        ]
+      }
+    ],
+    "ctc_reduction": "ONNX device-side ArgMax/ReduceMax",
+    "partial_cache_policy": "full detection; exact unchanged tile/crop recognition reuse; GPU uses exact tiled equality, no collision risk",
+    "engine_cache_files": [
+      "trt_cache_gpu0/ch_PP-OCRv4_det_infer/TensorrtExecutionProvider_TRTKernel_graph_Model from PaddlePaddle._18240225871490467539_0_0_fp16_sm75.engine",
+      "trt_cache_gpu0/ch_PP-OCRv4_rec_infer-ctc-v1-48fc40f24f6d2a20/TensorrtExecutionProvider_TRTKernel_graph_Model from PaddlePaddle._12420076362657121020_0_0_fp16_sm75.engine",
+      "trt_cache_gpu1/ch_PP-OCRv4_rec_infer-ctc-v1-48fc40f24f6d2a20/TensorrtExecutionProvider_TRTKernel_graph_Model from PaddlePaddle._12420076362657121020_0_0_fp16_sm75.engine"
+    ]
+  },
+  "startup_engine_warmup_ms": 722756.8373070001,
+  "first_frame_ocr_ms": 1397.582539999803,
+  "warm_uncached_ocr_ms": {
+    "p50": 29.026847500063013,
+    "p95": 31.128167999895595,
+    "samples": [
+      29.575558000033197,
+      29.444741000133945,
+      27.861415999950623,
+      29.356688000007125,
+      31.54390899999271,
+      31.128167999895595,
+      30.75337999985095,
+      29.632086999981766,
+      28.74432900011925,
+      29.16485300011118,
+      30.94308300001103,
+      29.20002999985627,
+      28.888842000014847,
+      28.3684149999317,
+      28.676590000031865,
+      28.712650999977996,
+      26.845198000046366,
+      26.703252000061184,
+      26.868093000075532,
+      26.453766000031465
+    ]
+  },
+  "changed_frame_sequence_ms": [
+    26.28743700006453,
+    25.778877000220746,
+    25.790464000010616,
+    25.948614999833808,
+    26.463723000006212
+  ],
+  "exact_repeat_cache_ms": {
+    "p50": 0.352072000168846
+  },
+  "recognized_element_counts": [
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31
+  ],
+  "sample_text": [
+    "Healthy",
+    "Service 2",
+    "Healthy",
+    "Healthy",
+    "Logs",
+    "Service 4",
+    "Healthy",
+    "Dashboard",
+    "Latency 20 ms",
+    "Service 1",
+    "Latency 21 ms ",
+    "API Keys"
+  ],
+  "quality_gate_minimum_5_elements": true,
+  "assumed_http_and_other_overhead_ms": 18.0,
+  "assumed_vendor_generation_tokens_per_second": 1068,
+  "projected_paired_tokens_per_second": {
+    "250": 889.33,
+    "500": 970.51,
+    "1000": 1016.93
+  },
+  "projected_700_target_met": true,
+  "actual_live_provider_throughput_verified": false,
+  "dual_T4_latency_target_verified": true,
+  "source_archive_sha256": "74cbbda0d098a0f5d33ad31c1da317f1243d2dd4ec0fe25878238b3153f39e38",
+  "validation_scope": "20 warm uncached synthetic frames sharing one layout; no real provider call; TensorRT engine flag is not per-operator precision proof"
+}

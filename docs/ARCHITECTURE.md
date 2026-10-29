@@ -32,6 +32,8 @@ TensorRT FP16 is requested on supported GPUs. ONNX model input/output dtypes are
 
 GPU JPEG decode is supported through torchvision. GPU PNG decoding is not implemented. Detector postprocessing uses a small CPU probability map; full screenshot CPU decoding/resizing is not used in strict GPU mode. Crops are axis-aligned; rotated perspective correction is not implemented.
 
+The `dual_cuda` backend label denotes two CUDA devices; inspect actual session provider lists and cached engines to distinguish TensorRT from CUDA-only execution.
+
 ## Cache correctness
 
 Exact-frame caching and unchanged-tile/crop recognition reuse are bounded. GPU tile comparisons use exact equality. Detection reruns globally to avoid missing boxes crossing tile boundaries. Frame IDs/timestamps are regenerated on cache hits. Cache speed is reported separately from uncached performance.

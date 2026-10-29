@@ -1,0 +1,21 @@
+{
+  "kind": "REAL_DUAL_GPU_CUDA_OCR_WITH_SIMULATED_NOT_LIVE_PROVIDER",
+  "health": "ready",
+  "real_ocr": {
+    "elements": 31,
+    "latency_ms": 1550.755382000034,
+    "backend": "dual_cuda"
+  },
+  "mock_json": {
+    "status": 200,
+    "simulation_label": "true",
+    "done_present": null
+  },
+  "mock_sse": {
+    "status": 200,
+    "simulation_label": "true",
+    "done_present": true
+  },
+  "unauthorized_admin_rejected": true,
+  "hot_reload_placeholder_only": true
+}

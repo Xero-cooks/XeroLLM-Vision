@@ -1,0 +1,134 @@
+{
+  "kind": "MEASURED_REAL_OCR_WITH_PROJECTED_NOT_LIVE_PROVIDER_THROUGHPUT",
+  "backend": "dual_cuda",
+  "environment": {
+    "backend": "dual_cuda",
+    "warmed": true,
+    "detector_providers": [
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "recognizer_providers": [
+      [
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ],
+      [
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider"
+      ]
+    ],
+    "precision": "CUDA/CPU graph precision; TensorRT explicitly disabled (not FP16 acceptance)",
+    "gpu_count": 2,
+    "gpu": [
+      {
+        "id": 0,
+        "name": "Tesla T4",
+        "allocated_bytes": 6220800,
+        "free_total_bytes": [
+          14211153920,
+          15636037632
+        ]
+      },
+      {
+        "id": 1,
+        "name": "Tesla T4",
+        "allocated_bytes": 0,
+        "free_total_bytes": [
+          14391508992,
+          15636037632
+        ]
+      }
+    ],
+    "ctc_reduction": "ONNX device-side ArgMax/ReduceMax",
+    "partial_cache_policy": "full detection; exact unchanged tile/crop recognition reuse; GPU uses exact tiled equality, no collision risk",
+    "engine_cache_files": []
+  },
+  "startup_engine_warmup_ms": 4649.962210000012,
+  "first_frame_ocr_ms": 4877.493364999964,
+  "warm_uncached_ocr_ms": {
+    "p50": 101.76540250006383,
+    "p95": 109.12681400009205,
+    "samples": [
+      112.05875199993898,
+      109.12681400009205,
+      102.44313900000179,
+      105.33327299992834,
+      102.25925800000368,
+      101.45452800009025,
+      101.09737900006621,
+      100.61453399998754,
+      105.43327100003808,
+      100.88200000006964,
+      100.39850700002262,
+      99.54804599999534,
+      100.1853510000501,
+      99.24741400004677,
+      100.55434699995658,
+      101.23862099999315,
+      105.83318600004077,
+      102.07627700003741,
+      105.09160399999473,
+      102.15233500002796
+    ]
+  },
+  "changed_frame_sequence_ms": [
+    130.97356500009028,
+    103.26198399991426,
+    98.38444199999685,
+    100.95325100007813,
+    96.71786800004156
+  ],
+  "exact_repeat_cache_ms": {
+    "p50": 0.3236390000438405
+  },
+  "recognized_element_counts": [
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31
+  ],
+  "sample_text": [
+    "Healthy",
+    "Service 2",
+    "Healthy",
+    "Healthy",
+    "Logs",
+    "Service 4",
+    "Healthy",
+    "Dashboard",
+    "Latency 20 ms",
+    "Service 1",
+    "Latency 21 ms ",
+    "API Keys"
+  ],
+  "quality_gate_minimum_5_elements": true,
+  "assumed_http_and_other_overhead_ms": 18.0,
+  "assumed_vendor_generation_tokens_per_second": 1068,
+  "projected_paired_tokens_per_second": {
+    "250": 706.52,
+    "500": 850.44,
+    "1000": 946.88
+  },
+  "projected_700_target_met": true,
+  "actual_live_provider_throughput_verified": false,
+  "dual_T4_latency_target_verified": false,
+  "source_archive_sha256": "74cbbda0d098a0f5d33ad31c1da317f1243d2dd4ec0fe25878238b3153f39e38",
+  "validation_scope": "20 warm uncached synthetic frames sharing one layout; no real provider call; TensorRT engine flag is not per-operator precision proof"
+}

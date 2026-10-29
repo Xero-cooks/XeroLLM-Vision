@@ -1,6 +1,6 @@
 # Contributing
 
-Use Python3.13 and a fresh environment. Follow the CPU quick start in README, then run:
+Use Python 3.13 and a fresh environment. Follow the CPU quick start in README, then run:
 
 ```bash
 python -m pytest -q tests

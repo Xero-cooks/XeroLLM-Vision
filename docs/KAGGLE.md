@@ -2,9 +2,9 @@
 
 ## Target and current status
 
-Target: **2× Tesla T4, `sm_75`, approximately16 GB per device**, PCIe rather than NVLink. Actual validation confirmed two T4s on Python3.13.15. Provider enumeration alone does not prove an execution session initialized. Read benchmark and health receipts.
+Target: **2× Tesla T4, `sm_75`, approximately 16 GB per device**, PCIe rather than NVLink. Actual validation confirmed two T4s on Python 3.13.15. Provider enumeration alone does not prove an execution session initialized. Read benchmark and health receipts.
 
-No GPU latency or ≥700tok/s paired-performance acceptance is currently published. Earlier TensorRT preparation exceeded a 600-second process budget; the staged job preserves CUDA results before a separately bounded TensorRT attempt.
+The staged validation job completed. TensorRT FP16 was requested with three cached engines, measuring **29.03 ms p50 / 31.13 ms p95** across 20 warm uncached synthetic-frame requests. CUDA-only measured101.77 ms p50. Cold TensorRT preparation/warmup took722.76 seconds, and its first encoded frame took1397.58 ms. No ≥700 tok/s **live-provider** result is published. These are controlled measurements, not a latency SLA.
 
 ## Candidate dependency stack
 

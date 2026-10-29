@@ -1,0 +1,523 @@
+{
+  "kind": "ACTUAL_OCR_SYNTHETIC_LABEL_CHECK_NOT_REAL_WORLD_ACCURACY",
+  "backend": "dual_cuda",
+  "expected_labels": {
+    "Dashboard": true,
+    "API Keys": true,
+    "Logs": true,
+    "Settings": true,
+    "Deploy Gateway": true,
+    "Healthy": true,
+    "Submit": true,
+    "Cancel": true,
+    "Service 1": true,
+    "Service 2": true,
+    "Service 3": true,
+    "Service 4": true,
+    "Service 5": true,
+    "Service 6": true,
+    "Service 7": true,
+    "Service 8": false
+  },
+  "label_count": 16,
+  "exact_substring_matches": 15,
+  "elements": [
+    {
+      "id": "e0",
+      "text": "Healthy",
+      "box": [
+        898.6500000000001,
+        157.65,
+        1009.35,
+        193.35000000000002
+      ],
+      "confidence": 0.999920231955392,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        162
+      ]
+    },
+    {
+      "id": "e1",
+      "text": "Service 2",
+      "box": [
+        417.59999999999997,
+        243.60000000000002,
+        551.4000000000001,
+        284.40000000000003
+      ],
+      "confidence": 0.9984636306762695,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        244
+      ]
+    },
+    {
+      "id": "e2",
+      "text": "Healthy",
+      "box": [
+        897.6,
+        243.60000000000002,
+        1010.4000000000001,
+        284.40000000000003
+      ],
+      "confidence": 0.9998603292873928,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        244
+      ]
+    },
+    {
+      "id": "e3",
+      "text": "Healthy",
+      "box": [
+        898.6500000000001,
+        337.65000000000003,
+        1009.35,
+        373.35
+      ],
+      "confidence": 0.9999452744211469,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        329
+      ]
+    },
+    {
+      "id": "e4",
+      "text": "Logs",
+      "box": [
+        29.55,
+        362.55,
+        111.45,
+        408.45000000000005
+      ],
+      "confidence": 0.9998097270727158,
+      "role": "unknown",
+      "center_normalized": [
+        37,
+        357
+      ]
+    },
+    {
+      "id": "e5",
+      "text": "Service 4",
+      "box": [
+        417.59999999999997,
+        423.59999999999997,
+        548.4000000000001,
+        464.40000000000003
+      ],
+      "confidence": 0.9658771289719476,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        411
+      ]
+    },
+    {
+      "id": "e6",
+      "text": "Healthy",
+      "box": [
+        897.6,
+        423.59999999999997,
+        1010.4000000000001,
+        464.40000000000003
+      ],
+      "confidence": 0.9408996190343585,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        411
+      ]
+    },
+    {
+      "id": "e7",
+      "text": "Dashboard",
+      "box": [
+        35.7,
+        149.70000000000002,
+        189.3,
+        180.3
+      ],
+      "confidence": 0.9975229104359945,
+      "role": "unknown",
+      "center_normalized": [
+        59,
+        153
+      ]
+    },
+    {
+      "id": "e8",
+      "text": "Latency 20 ms",
+      "box": [
+        1348.65,
+        157.65,
+        1549.3500000000001,
+        193.35000000000002
+      ],
+      "confidence": 0.9992671746474046,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        162
+      ]
+    },
+    {
+      "id": "e9",
+      "text": "Service 1",
+      "box": [
+        419.70000000000005,
+        158.70000000000002,
+        546.3000000000001,
+        189.3
+      ],
+      "confidence": 0.9309172961446974,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        161
+      ]
+    },
+    {
+      "id": "e10",
+      "text": "Latency 21 ms ",
+      "box": [
+        1347.6000000000001,
+        243.60000000000002,
+        1550.3999999999999,
+        284.40000000000003
+      ],
+      "confidence": 0.947621979883739,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        244
+      ]
+    },
+    {
+      "id": "e11",
+      "text": "API Keys",
+      "box": [
+        34.650000000000006,
+        256.65000000000003,
+        157.35000000000002,
+        292.35
+      ],
+      "confidence": 0.9187015146017075,
+      "role": "unknown",
+      "center_normalized": [
+        50,
+        254
+      ]
+    },
+    {
+      "id": "e12",
+      "text": "Service 3",
+      "box": [
+        418.65000000000003,
+        334.65000000000003,
+        547.35,
+        370.35
+      ],
+      "confidence": 0.9317151572969224,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        326
+      ]
+    },
+    {
+      "id": "e13",
+      "text": "Latency 22 ms",
+      "box": [
+        1348.65,
+        337.65000000000003,
+        1549.3500000000001,
+        373.35
+      ],
+      "confidence": 0.9989906687002915,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        329
+      ]
+    },
+    {
+      "id": "e14",
+      "text": "Latency 23 ms ",
+      "box": [
+        1347.6000000000001,
+        423.59999999999997,
+        1550.3999999999999,
+        464.40000000000003
+      ],
+      "confidence": 0.9458756148815155,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        411
+      ]
+    },
+    {
+      "id": "e15",
+      "text": "MercuryGateway File Edit View Search",
+      "box": [
+        40.650000000000006,
+        28.650000000000002,
+        637.35,
+        64.35000000000001
+      ],
+      "confidence": 0.9715248362885581,
+      "role": "unknown",
+      "center_normalized": [
+        177,
+        43
+      ]
+    },
+    {
+      "id": "e16",
+      "text": "Settings",
+      "box": [
+        33.6,
+        474.59999999999997,
+        152.4,
+        515.4000000000001
+      ],
+      "confidence": 0.9985218867659569,
+      "role": "unknown",
+      "center_normalized": [
+        48,
+        458
+      ]
+    },
+    {
+      "id": "e17",
+      "text": "Healthy",
+      "box": [
+        898.6500000000001,
+        517.6500000000001,
+        1009.35,
+        553.35
+      ],
+      "confidence": 0.9999159233910697,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        496
+      ]
+    },
+    {
+      "id": "e18",
+      "text": "Service 6",
+      "box": [
+        417.59999999999997,
+        603.6,
+        548.4000000000001,
+        644.4000000000001
+      ],
+      "confidence": 0.9979577726787991,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        578
+      ]
+    },
+    {
+      "id": "e19",
+      "text": "Healthy",
+      "box": [
+        897.6,
+        603.6,
+        1013.4000000000001,
+        644.4000000000001
+      ],
+      "confidence": 0.999812160219465,
+      "role": "unknown",
+      "center_normalized": [
+        498,
+        578
+      ]
+    },
+    {
+      "id": "e20",
+      "text": "Healthy",
+      "box": [
+        898.6500000000001,
+        697.6500000000001,
+        1009.35,
+        733.35
+      ],
+      "confidence": 0.9999265500477382,
+      "role": "unknown",
+      "center_normalized": [
+        497,
+        662
+      ]
+    },
+    {
+      "id": "e21",
+      "text": "Healthy",
+      "box": [
+        897.6,
+        783.6,
+        1013.4000000000001,
+        824.4000000000001
+      ],
+      "confidence": 0.9998672774859837,
+      "role": "unknown",
+      "center_normalized": [
+        498,
+        744
+      ]
+    },
+    {
+      "id": "e22",
+      "text": "Service 5",
+      "box": [
+        418.65000000000003,
+        517.6500000000001,
+        547.35,
+        553.35
+      ],
+      "confidence": 0.8984295560253991,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        496
+      ]
+    },
+    {
+      "id": "e23",
+      "text": "Latency 24 ms",
+      "box": [
+        1348.65,
+        517.6500000000001,
+        1549.3500000000001,
+        553.35
+      ],
+      "confidence": 0.9992227921119103,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        496
+      ]
+    },
+    {
+      "id": "e24",
+      "text": "Deploy Gateway",
+      "box": [
+        34.650000000000006,
+        586.6500000000001,
+        259.35,
+        622.35
+      ],
+      "confidence": 0.9662541406495231,
+      "role": "unknown",
+      "center_normalized": [
+        77,
+        560
+      ]
+    },
+    {
+      "id": "e25",
+      "text": "Latency 25 ms ",
+      "box": [
+        1347.6000000000001,
+        603.6,
+        1550.3999999999999,
+        644.4000000000001
+      ],
+      "confidence": 0.9438365740435464,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        578
+      ]
+    },
+    {
+      "id": "e26",
+      "text": "Service 7",
+      "box": [
+        418.65000000000003,
+        694.6500000000001,
+        547.35,
+        730.35
+      ],
+      "confidence": 0.9129918548795912,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        660
+      ]
+    },
+    {
+      "id": "e27",
+      "text": "Latency 26 ms",
+      "box": [
+        1351.65,
+        697.6500000000001,
+        1549.3500000000001,
+        733.35
+      ],
+      "confidence": 0.9952850525195782,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        662
+      ]
+    },
+    {
+      "id": "e28",
+      "text": "Latency 27 ms ",
+      "box": [
+        1347.6000000000001,
+        783.6,
+        1550.3999999999999,
+        824.4000000000001
+      ],
+      "confidence": 0.941876083612442,
+      "role": "unknown",
+      "center_normalized": [
+        755,
+        744
+      ]
+    },
+    {
+      "id": "e29",
+      "text": "Service8",
+      "box": [
+        418.65000000000003,
+        784.6500000000001,
+        550.35,
+        820.35
+      ],
+      "confidence": 0.9786281138658524,
+      "role": "unknown",
+      "center_normalized": [
+        252,
+        743
+      ]
+    },
+    {
+      "id": "e30",
+      "text": "Frame oooSubmitCancel",
+      "box": [
+        443.70000000000005,
+        959.6999999999999,
+        822.3000000000001,
+        990.3000000000001
+      ],
+      "confidence": 0.9703191518783569,
+      "role": "unknown",
+      "center_normalized": [
+        330,
+        903
+      ]
+    }
+  ],
+  "limitations": "Single synthetic font/layout. Exact matching retains whitespace errors. No click success, icon or semantic quality validation."
+}

@@ -13,9 +13,19 @@
     "onnxruntime": "1.22.0"
   },
   "remote_unit_tests_passed": 51,
-  "last_completed_tensorRT_stage": "library loading and model parsing; benchmark process exceeded 600-second preparation budget",
-  "GPU_latency_measured": false,
+  "last_completed_tensorRT_stage": "real dual-T4 encoder benchmark, 20 warm uncached requests",
+  "GPU_latency_measured": true,
   "live_provider_throughput_measured": false,
-  "next_validation": "CUDA-only benchmark and endpoint checks, then separately bounded TensorRT FP16 preparation",
-  "privacy": "Aggregated validation summary; no private notebook URLs, credentials or raw user logs."
+  "next_validation": "real Mercury provider throughput, diverse UI quality, TensorRT API-server smoke and stable authenticated hosting",
+  "privacy": "Aggregated validation summary; no private notebook URLs, credentials or raw user logs.",
+  "latest_private_validation_job_status": "COMPLETE",
+  "TensorRT_FP16_requested_and_three_cached_engines_observed": true,
+  "warm_uncached_gpu_tensorrt_ms": {
+    "p50": 29.026847500063013,
+    "p95": 31.128167999895595
+  },
+  "TensorRT_engine_preparation_and_warmup_ms": 722756.8373070001,
+  "last_completed_CUDA_stage": "real dual-GPU benchmark, synthetic label check, authenticated HTTP OCR and mock JSON/SSE smoke",
+  "GPU_numeric_check": "independent sorted-sample p50 and nearest-rank p95 recomputed; matched benchmark reports",
+  "TensorRT_quality_limit": "nonempty recognized elements/sample text observed; full labeled quality check and HTTP smoke in this run used CUDA-only, not TensorRT"
 }

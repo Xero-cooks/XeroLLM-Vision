@@ -4,7 +4,7 @@
 
 Send a screenshot using a standard OpenAI `image_url` message. The gateway reads visible text, attaches bounding boxes and normalized coordinates, converts the observation to compact spatial Markdown, then forwards a text-only request to Inception's Mercury 3 API.
 
-> **Experimental.** This is an independent open-source project, not an Inception Labs product. Dual-T4 execution is under validation. The requested 20–32 ms encoding and ≥700 end-to-end tokens/s are **targets, not demonstrated results**. Model decode speed, mock responses and projected throughput are not live benchmarks.
+> **Experimental.** This is an independent open-source project, not an Inception Labs product. A dual-T4 TensorRT FP16 configuration measured **29.03 ms p50 / 31.13 ms p95** on 20 warm uncached synthetic-frame requests. The ≥700 end-to-end tokens/s goal is **not a demonstrated live-provider result**. Model decode speed, mock responses and projected throughput are not live benchmarks.
 
 ## What it does
 
@@ -92,16 +92,18 @@ See [API reference](docs/API.md) for real-image dry runs, streaming, key injecti
 
 ## Kaggle: 2× Tesla T4
 
-The target is two 16 GB Turing `sm_75` GPUs, without NVLink. Use TensorRT **FP16**, not BF16 or FP8. Two actual T4s and 51 remote tests have been observed; TensorRT engine preparation exceeded an earlier time budget, so no GPU latency guarantee is published.
+The target is two 16 GB Turing `sm_75` GPUs, without NVLink. Use TensorRT **FP16**, not BF16 or FP8. Two actual T4s and 51 remote tests were observed. A later staged run completed TensorRT preparation in about 12 minutes and measured29.03 ms warm p50. This is a controlled synthetic benchmark, not a general latency guarantee.
 
-The Python3.13 candidate stack uses ORT-GPU1.22, torch2.7.1/torchvision0.22.1 CUDA12.6 and TensorRT10.9. Follow the complete [Kaggle compatibility and deployment guide](docs/KAGGLE.md). Kaggle is an ephemeral, quota-limited development environment—not an always-on production host.
+The Python 3.13 candidate stack uses ORT-GPU 1.22, torch 2.7.1 / torchvision 0.22.1 CUDA 12.6 and TensorRT 10.9. Follow the complete [Kaggle compatibility and deployment guide](docs/KAGGLE.md). Kaggle is an ephemeral, quota-limited development environment—not an always-on production host.
 
 ## Validation status
 
 - **51 local and 51 remote unit/contract tests passed** on recorded snapshots.
 - Actual CPU OCR baseline: **902.58 ms p50**, **989.15 ms p95**, 20 uncached synthetic-frame measurements. Not a GPU result.
 - Terminal CTC ArgMax/ReduceMax matched the original recognizer's IDs and scores in a CPU numerical equivalence test.
-- **GPU latency, live Mercury paired throughput, public hosting and production readiness remain unverified.**
+- Actual dual-T4 TensorRT configuration: **29.03 ms warm p50 / 31.13 ms p95**,20 uncached synthetic measurements; cold preparation/warmup **722.76 seconds**, first encoded frame **1397.58 ms**. Three cached engines were observed.
+- Real GPU HTTP OCR and mocked JSON/SSE checks passed using **CUDA-only** sessions; TensorRT-specific HTTP smoke remains separate work.
+- **Live Mercury paired throughput, stable public hosting and production readiness remain unverified.**
 
 See [benchmark methodology](docs/BENCHMARKING.md) and [sanitized evidence](evidence/validation-status.json). Historical measurements must not be interpreted as results for every subsequent commit.
 

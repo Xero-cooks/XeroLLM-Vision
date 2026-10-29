@@ -12,7 +12,7 @@ All `/v1/*` endpoints and `/health` require `Authorization: Bearer $GATEWAY_TOKE
 
 ## Provider keys
 
-Use legitimate keys within the provider's terms. The pool is not a quota-evasion or account-rotation mechanism. A429 honors Retry-After and conservatively cools down the pool; rejected requests are not replayed through another key.
+Use legitimate keys within the provider's terms. The pool is not a quota-evasion or account-rotation mechanism. A 429 honors Retry-After and conservatively cools down the pool; rejected requests are not replayed through another key.
 
 Set `INCEPTION_API_KEYS` as runtime secrets, or create a protected local JSON file containing `{"keys":["YOUR_PROVIDER_KEY"],"mode":"replace"}` and inject it:
 
@@ -29,15 +29,15 @@ Keys are never returned. Hot reload is in-memory, single-worker and does not sur
 
 `/v1/ocr` accepts `{"image_url":"data:image/jpeg;base64,...","frame_id":"turn-1","captured_at":"2026-01-01T00:00:00Z"}`. `image_url` may alternatively be an object with a `url` field. A chat image uses the standard `{"type":"image_url","image_url":{"url":"..."}}` block.
 
-- `X-UI-Resolution: high` selects a768×448 detector canvas; default640×384.
+- `X-UI-Resolution: high` selects a 768×448 detector canvas; default 640×384.
 - `X-Session-ID` namespaces caches; this is not multi-tenant authentication.
 - Strict GPU mode accepts JPEG only; CPU staging also supports PNG/WebP.
 - Remote images are disabled by default. Opt in with `ALLOW_REMOTE_IMAGES=true` and exact `IMAGE_HOST_ALLOWLIST` hostnames. HTTPS, public-address validation, IP pinning, redirect/size/time bounds apply.
-- Outputs include normalized center coordinates0..1000, original pixel boxes and geometric relationships. They do not assert widget roles or icon meaning.
+- Outputs include normalized center coordinates 0..1000, original pixel boxes and geometric relationships. They do not assert widget roles or icon meaning.
 
 ## Dry runs
 
-Send `X-Dry-Run: true` with a normal chat request. It runs the **real selected image encoder**, then simulates provider output. It uses `mercury-3-MOCK`, `X-Gateway-Simulation: true` and simulated lexical units—not measured provider tokens. `ALLOW_MOCK_WHEN_PLACEHOLDER=true` enables automatic placeholder fallback explicitly. Without either opt-in, placeholder-only upstream requests fail503.
+Send `X-Dry-Run: true` with a normal chat request. It runs the **real selected image encoder**, then simulates provider output. It uses `mercury-3-MOCK`, `X-Gateway-Simulation: true` and simulated lexical units—not measured provider tokens. `ALLOW_MOCK_WHEN_PLACEHOLDER=true` enables automatic placeholder fallback explicitly. Without either opt-in, placeholder-only upstream requests fail 503.
 
 ## Streaming and metrics
 
