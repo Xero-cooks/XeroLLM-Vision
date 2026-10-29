@@ -152,3 +152,47 @@ async def test_remote_private_dns_rejected(monkeypatch):
 def test_equal_admin_client_secrets_rejected():
     with pytest.raises(ValueError,match='must be different'):
         create_app(Settings(gateway_token='same-secret',admin_token='same-secret'),FixtureEncoder())
+
+def test_agent_model_discovery():
+    with client() as c:
+        assert c.get('/v1/models').status_code==401
+        assert c.get('/v1/models',headers=A).json()['data'][0]['id']=='mercury-3'
+
+@pytest.mark.parametrize('first_status',[401,403,500,502,503,504])
+def test_bounded_failover_on_key_auth_or_transient_status(first_status):
+    calls=[]
+    def handle(r):
+        calls.append(r.headers['authorization'])
+        return httpx.Response(first_status,json={'error':'private text'}) if len(calls)==1 else httpx.Response(200,json={'choices':[],'usage':{'completion_tokens':1}})
+    with client(config(keys=['provider-key-111','provider-key-222']),httpx.MockTransport(handle)) as c:
+        r=c.post('/v1/chat/completions',headers=A,json=payload());assert r.status_code==200 and r.headers['x-upstream-attempts']=='2'
+    assert len(calls)==2 and calls[0]!=calls[1]
+
+def test_per_key_429_failover_when_explicitly_configured():
+    calls=[]
+    def handle(r):
+        calls.append(r);return httpx.Response(429,headers={'retry-after':'30'},json={'error':{'code':'rate_limit'}}) if len(calls)==1 else httpx.Response(200,json={'choices':[]})
+    with client(config(keys=['provider-key-111','provider-key-222'],rate_limit_scope='key'),httpx.MockTransport(handle)) as c:
+        assert c.post('/v1/chat/completions',headers=A,json=payload()).status_code==200
+    assert len(calls)==2
+
+def test_account_quota_never_replayed_even_with_key_scope():
+    calls=[]
+    def handle(r):calls.append(r);return httpx.Response(429,json={'error':{'code':'insufficient_quota'}})
+    with client(config(keys=['provider-key-111','provider-key-222'],rate_limit_scope='key'),httpx.MockTransport(handle)) as c:
+        assert c.post('/v1/chat/completions',headers=A,json=payload()).status_code==429
+    assert len(calls)==1
+
+def test_bad_payload_not_retried():
+    calls=[]
+    def handle(r):calls.append(r);return httpx.Response(400,json={'error':'bad input'})
+    with client(config(keys=['provider-key-111','provider-key-222']),httpx.MockTransport(handle)) as c:
+        assert c.post('/v1/chat/completions',headers=A,json=payload()).status_code==400
+    assert len(calls)==1
+
+def test_ambiguous_read_timeout_not_replayed():
+    calls=[]
+    def handle(r):calls.append(r);raise httpx.ReadTimeout('private error',request=r)
+    with client(config(keys=['provider-key-111','provider-key-222']),httpx.MockTransport(handle)) as c:
+        assert c.post('/v1/chat/completions',headers=A,json=payload()).status_code==502
+    assert len(calls)==1

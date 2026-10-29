@@ -12,3 +12,8 @@ kaggle_preflight.py
 kaggle-*.log
 *-install.log
 .local*
+
+.live-prepared/
+.private/
+live_bootstrap.py
+agent-connection.json

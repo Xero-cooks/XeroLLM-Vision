@@ -8,13 +8,14 @@ Send a screenshot using a standard OpenAI `image_url` message. The gateway reads
 
 ## What it does
 
-- Accepts `POST /v1/chat/completions`, including JSON and SSE responses.
+- Accepts `POST /v1/chat/completions`, including JSON and SSE responses, plus authenticated `GET /v1/models` for agent discovery.
 - Rewrites screenshot `image_url` blocks while preserving text, tool history and tool schemas.
 - Provides `POST /v1/ocr` for standalone text, boxes, confidence, frame metadata and geometric reading-order relationships.
 - Implements PP-OCRv4 ONNX detection and recognition, with experimental TensorRT FP16 acceleration and concurrent dual-GPU recognition.
 - Uses rectangular detector canvases and GPU JPEG decoding on supported CUDA installations.
 - Caches exact frames and eligible unchanged-region recognition results.
-- Supports authenticated provider-key hot reload, placeholder-only dry runs, cooldowns and masked status.
+- Supports authenticated provider-key hot reload, round-robin selection, bounded safe failover, placeholder-only dry runs, cooldowns and masked status.
+- Includes a private Kaggle serving-session packager, one-use HTTPS runtime enrollment and a public ingress that blocks admin routes.
 - Lets you replace the baseline through a trusted local encoder factory.
 
 ## What it does not do
@@ -88,17 +89,17 @@ result = client.chat.completions.create(
 print(result.choices[0].message.content)
 ```
 
-See [API reference](docs/API.md) for real-image dry runs, streaming, key injection and telemetry.
+See [API reference](docs/API.md) for real-image dry runs, streaming, key injection and telemetry. For a session-limited agent-facing endpoint, see [live Kaggle hosting](docs/HOSTING.md).
 
 ## Kaggle: 2× Tesla T4
 
-The target is two 16 GB Turing `sm_75` GPUs, without NVLink. Use TensorRT **FP16**, not BF16 or FP8. Two actual T4s and 51 remote tests were observed. A later staged run completed TensorRT preparation in about 12 minutes and measured29.03 ms warm p50. This is a controlled synthetic benchmark, not a general latency guarantee.
+The target is two 16 GB Turing `sm_75` GPUs, without NVLink. Use TensorRT **FP16**, not BF16 or FP8. Two actual T4s and 51 remote tests were observed. A later staged run completed TensorRT preparation in about 12 minutes and measured 29.03 ms warm p50. This is a controlled synthetic benchmark, not a general latency guarantee.
 
 The Python 3.13 candidate stack uses ORT-GPU 1.22, torch 2.7.1 / torchvision 0.22.1 CUDA 12.6 and TensorRT 10.9. Follow the complete [Kaggle compatibility and deployment guide](docs/KAGGLE.md). Kaggle is an ephemeral, quota-limited development environment—not an always-on production host.
 
 ## Validation status
 
-- **51 local and 51 remote unit/contract tests passed** on recorded snapshots.
+- **66 local unit/contract tests pass** for the current repository. Earlier GPU validation snapshots passed 51 remote tests; live deployment runs its own bundled contract suite before startup.
 - Actual CPU OCR baseline: **902.58 ms p50**, **989.15 ms p95**, 20 uncached synthetic-frame measurements. Not a GPU result.
 - Terminal CTC ArgMax/ReduceMax matched the original recognizer's IDs and scores in a CPU numerical equivalence test.
 - Actual dual-T4 TensorRT configuration: **29.03 ms warm p50 / 31.13 ms p95**,20 uncached synthetic measurements; cold preparation/warmup **722.76 seconds**, first encoded frame **1397.58 ms**. Three cached engines were observed.
@@ -114,6 +115,7 @@ See [benchmark methodology](docs/BENCHMARKING.md) and [sanitized evidence](evide
 | [Architecture](docs/ARCHITECTURE.md) | Data flow, modules, precision, caching and encoder plugins |
 | [API](docs/API.md) | Endpoints, credentials, examples, SSE and metrics |
 | [Kaggle](docs/KAGGLE.md) | Hardware constraints, dependency pins, validation jobs and troubleshooting |
+| [Live hosting](docs/HOSTING.md) | Secure Kaggle session, tunnel, key pool, agent pairing and expiry |
 | [Use cases](docs/USE_CASES.md) | Where this approach helps and where it fails |
 | [Benchmarking](docs/BENCHMARKING.md) | Measured vs projected vs simulated throughput |
 | [Security](SECURITY.md) | Threat model and safe deployment |

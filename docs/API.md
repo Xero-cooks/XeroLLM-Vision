@@ -5,6 +5,7 @@ All `/v1/*` endpoints and `/health` require `Authorization: Bearer $GATEWAY_TOKE
 | Endpoint | Purpose |
 |---|---|
 | `POST /v1/chat/completions` | OpenAI chat image-block rewriting and JSON/SSE proxying |
+| `GET /v1/models` | Authenticated model discovery (`mercury-3`) |
 | `POST /v1/ocr` | Standalone spatial Markdown, elements and metadata |
 | `GET /health` | Actual session providers, GPU memory, cache/precision and masked key status |
 | `POST /admin/keys` | Append/replace the provider key pool |
@@ -12,7 +13,7 @@ All `/v1/*` endpoints and `/health` require `Authorization: Bearer $GATEWAY_TOKE
 
 ## Provider keys
 
-Use legitimate keys within the provider's terms. The pool is not a quota-evasion or account-rotation mechanism. A 429 honors Retry-After and conservatively cools down the pool; rejected requests are not replayed through another key.
+Use legitimate keys within the provider's terms. The pool is not a quota-evasion or account-rotation mechanism. A 429 honors Retry-After and conservatively cools down the pool by default. Explicit per-key mode and bounded failover are described below.
 
 Set `INCEPTION_API_KEYS` as runtime secrets, or create a protected local JSON file containing `{"keys":["YOUR_PROVIDER_KEY"],"mode":"replace"}` and inject it:
 
@@ -46,3 +47,11 @@ Send `X-Dry-Run: true` with a normal chat request. It runs the **real selected i
 Headers include `X-OCR-Latency-Ms`, `X-Images-Processed`, `X-Cache-Hit-Ratio`, `X-Effective-Paired-Tok-Per-Sec`. For SSE, final throughput cannot be known when headers are sent, so it is `pending`. Request `X-Gateway-Metrics:true` for an optional final metrics chunk. A real rate still needs completion-token usage from the provider. JSON responses compute rate after receipt. Client-side networking is included only by the live benchmark, not the server's own wall clock.
 
 This is a chat-completions adapter, not every OpenAI endpoint. Upstream error bodies are sanitized; HTTP2 is negotiated, not guaranteed by client configuration.
+
+## Bounded failover
+
+Requests rotate eligible keys round-robin. Up to three distinct keys can be tried for connection establishment failures, key-specific 401/403 errors and transient 500/502/503/504 responses **before output delivery**. Rejected keys are disabled or cooled down. Ordinary 400 bad-input errors, ambiguous read/write transport failures and partially delivered streams are not replayed. Upstream error bodies and credentials are never relayed. `X-Upstream-Attempts` reports the attempt count.
+
+Rate-limit scope defaults to `KEY_RATE_LIMIT_SCOPE=pool`, safe when keys share one account quota. Set `KEY_RATE_LIMIT_SCOPE=key` only for legitimately independent key quotas: a 429 cools that key until Retry-After and an eligible alternate may be tried. Explicit account/global/billing/credit/quota signals still stop the pool. This option must not be used to evade provider account restrictions or terms.
+
+The public ingress exposes only model discovery, health, OCR and chat. `/admin/*` stays private even with a valid client bearer token. Perform hot reload from the trusted host/network, not the public tunnel.

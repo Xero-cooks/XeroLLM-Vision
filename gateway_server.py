@@ -59,11 +59,15 @@ def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->Fast
         except (ValueError,UnicodeError):raise HTTPException(400,'invalid JSON')
         if not isinstance(j,dict):raise HTTPException(400,'JSON object required')
         return j
-    def headers(metrics,rate=None):return {'X-OCR-Latency-Ms':f"{metrics.get('ocr_latency_ms',0):.3f}",'X-Images-Processed':str(metrics.get('images_processed',0)),'X-Cache-Hit-Ratio':f"{metrics.get('cache_hit_ratio',0):.3f}",'X-Effective-Paired-Tok-Per-Sec':str(rate) if rate is not None else 'pending','X-Gateway-OCR-Backend':','.join(metrics.get('backends',[])),'Cache-Control':'no-store'}
+    def headers(metrics,rate=None):return {'X-Upstream-Attempts':str(metrics.get('upstream_attempts',0)),'X-OCR-Latency-Ms':f"{metrics.get('ocr_latency_ms',0):.3f}",'X-Images-Processed':str(metrics.get('images_processed',0)),'X-Cache-Hit-Ratio':f"{metrics.get('cache_hit_ratio',0):.3f}",'X-Effective-Paired-Tok-Per-Sec':str(rate) if rate is not None else 'pending','X-Gateway-OCR-Backend':','.join(metrics.get('backends',[])),'Cache-Control':'no-store'}
     @app.get('/health')
     async def health(request:Request):
         auth(request)
         return {'status':'ready','ocr':engine.health(),'pool':pool.status(),'performance_targets_verified':False}
+    @app.get('/v1/models')
+    async def models(request:Request):
+        auth(request)
+        return {'object':'list','data':[{'id':cfg.model,'object':'model','created':0,'owned_by':'inceptionlabs'}]}
     @app.get('/admin/keys/status')
     async def key_status(request:Request):auth(request,True);return pool.status()
     @app.post('/admin/keys')
@@ -115,20 +119,45 @@ def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->Fast
                         yield 'data: [DONE]\n\n'
                     finally:app.state.limit.release()
                 held=False;h=headers(metrics,'simulated');h['X-Gateway-Simulation']='true';return StreamingResponse(simulated(),media_type='text/event-stream',headers=h)
-            try:key=pool.acquire()
-            except PoolUnavailable as e:raise HTTPException(503,str(e))
-            t=time.perf_counter()
-            try:response=await app.state.client.send(app.state.client.build_request('POST','/chat/completions',json=out,headers={'Authorization':'Bearer '+key.secret}),stream=True)
-            except httpx.HTTPError:raise HTTPException(502,'upstream transport failure; no automatic retry')
-            metrics['upstream_http_version']=response.http_version
-            metrics['upstream_headers_ms']=round((time.perf_counter()-t)*1000,3)
-            if response.status_code>=400:
-                status=response.status_code;retry=None
-                if status==429:retry=pool.limited(key,response.headers.get('retry-after'))
-                if status in (401,403):key.invalid=True
+            attempted:set[str]=set()
+            response=None
+            attempt_budget=max(1,min(cfg.max_upstream_attempts,8))
+            for attempt in range(attempt_budget):
+                try:key=pool.acquire(attempted)
+                except PoolUnavailable as e:raise HTTPException(503,str(e))
+                attempted.add(key.id);metrics['upstream_attempts']=attempt+1;t=time.perf_counter()
+                try:
+                    response=await app.state.client.send(app.state.client.build_request('POST','/chat/completions',json=out,headers={'Authorization':'Bearer '+key.secret}),stream=True)
+                except (httpx.ConnectError,httpx.ConnectTimeout,httpx.PoolTimeout):
+                    pool.failed(key)
+                    if attempt+1<attempt_budget:continue
+                    raise HTTPException(502,'upstream connection failed; retry budget exhausted')
+                except httpx.HTTPError:
+                    raise HTTPException(502,'ambiguous upstream transport failure; request not replayed')
+                metrics['upstream_http_version']=response.http_version
+                metrics['upstream_headers_ms']=round((time.perf_counter()-t)*1000,3)
+                if response.status_code<400:break
+                status=response.status_code;retry=None;can_retry=False
+                if status==429:
+                    # Explicit account/global quota signals override per-key configuration.
+                    scope=cfg.rate_limit_scope if cfg.rate_limit_scope in ('pool','key') else 'pool'
+                    if response.headers.get('x-ratelimit-scope','').lower() in ('account','organization','global'):scope='pool'
+                    error_bytes=bytearray()
+                    async for chunk in response.aiter_bytes():
+                        error_bytes.extend(chunk[:max(0,8192-len(error_bytes))])
+                        if len(error_bytes)>=8192:break
+                    try:
+                        err=json.loads(error_bytes).get('error',{})
+                        code=str(err.get('code',''))+' '+str(err.get('type','')) if isinstance(err,dict) else ''
+                        if any(word in code.lower() for word in ('quota','billing','credit','account')):scope='pool'
+                    except (ValueError,AttributeError):pass
+                    retry=pool.limited(key,response.headers.get('retry-after'),scope=scope);can_retry=scope=='key'
+                elif status in (401,403):pool.failed(key,invalid=True);can_retry=True
+                elif status in (500,502,503,504):pool.failed(key);can_retry=True
                 await response.aclose()
-                # Never relay upstream error bodies: providers may echo credentials.
-                return JSONResponse({'error':{'message':'upstream rejected request; no retry or alternate-key replay','upstream_status':status}},status_code=status,headers={**headers(metrics,'unavailable'),**({'Retry-After':str(retry)} if retry else {})})
+                if can_retry and attempt+1<attempt_budget:continue
+                return JSONResponse({'error':{'message':'upstream rejected request; retry policy exhausted or replay unsafe','upstream_status':status}},status_code=status,headers={**headers(metrics,'unavailable'),**({'Retry-After':str(retry)} if retry else {})})
+            if response is None:raise HTTPException(502,'no upstream response')
             if not out.get('stream'):
                 try:
                     raw=bytearray()
@@ -142,6 +171,7 @@ def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->Fast
                     tokens=result.get('usage',{}).get('completion_tokens');rate=round(tokens/(time.perf_counter()-request.state.start),2) if isinstance(tokens,int) and tokens>=0 else 'unavailable'
                     result['gateway_metrics']={**metrics,'paired_tokens_per_second':rate,'throughput_kind':'MEASURED_USING_PROVIDER_COMPLETION_TOKEN_USAGE'}
                     return JSONResponse(result,headers=headers(metrics,rate))
+                except httpx.HTTPError:raise HTTPException(502,'upstream response interrupted; ambiguous request not replayed')
                 finally:await response.aclose()
             if 'text/event-stream' not in response.headers.get('content-type',''):
                 await response.aclose();raise HTTPException(502,'upstream did not return SSE')

@@ -57,4 +57,4 @@ Engine preparation can take minutes. Keep caches between launches where feasible
 
 ## Hosting limits
 
-Kaggle sessions stop and quotas apply. A tunnel does not make them durable. For a public service, use a supervised host, HTTPS/access control, authentication, rate limits, isolated secrets and appropriate GPU/runtime licensing. This project does not provision a public tunnel or modify DNS.
+Kaggle sessions stop and quotas apply. A tunnel does not make them durable. For a public service, use a supervised host, HTTPS/access control, authentication, rate limits, isolated secrets and appropriate GPU/runtime licensing. The optional [live runner](HOSTING.md) provisions a temporary authenticated quick tunnel without changing existing DNS. It does not provide persistent hosting or a stable custom domain.

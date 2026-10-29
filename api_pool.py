@@ -1,9 +1,9 @@
 """Single-loop mutation is synchronous (no await inside), not cross-process lock-free."""
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 import hashlib,time,datetime,email.utils
 @dataclass
 class KeyState:
-    secret: str
+    secret: str = field(repr=False)
     calls: int = 0
     cooldown_until: float = 0.0
     invalid: bool = False
@@ -22,14 +22,14 @@ class InceptionKeyPool:
         unique=list(dict.fromkeys(names))
         if len(unique)>100: raise ValueError('pool limit')
         self.states=tuple(old.get(k) or KeyState(k) for k in unique); self.cursor%=len(self.states)
-    def acquire(self)->KeyState:
+    def acquire(self,exclude:set[str]|None=None)->KeyState:
         now=time.monotonic()
         if now<self.global_until: raise PoolUnavailable('provider cooldown active')
         for _ in self.states:
             s=self.states[self.cursor%len(self.states)];self.cursor=(self.cursor+1)%len(self.states)
-            if not s.placeholder and not s.invalid and s.cooldown_until<=now: s.calls+=1;return s
+            if (not exclude or s.id not in exclude) and not s.placeholder and not s.invalid and s.cooldown_until<=now: s.calls+=1;return s
         raise PoolUnavailable('no usable provider keys')
-    def limited(self,s:KeyState,retry_after:str|None)->int:
+    def limited(self,s:KeyState,retry_after:str|None,scope:str='pool')->int:
         seconds=60.
         if retry_after:
             try: seconds=float(retry_after)
@@ -40,7 +40,10 @@ class InceptionKeyPool:
         seconds=min(max(seconds,1.),86400.)
         s.cooldown_until=time.monotonic()+seconds
         # Fail closed across the pool: keys can share one account's quota. No retry/key hopping.
-        self.global_until=max(self.global_until,s.cooldown_until);return int(seconds+0.999)
+        if scope=='pool':self.global_until=max(self.global_until,s.cooldown_until)
+        return int(seconds+0.999)
+    def failed(self,s:KeyState,cooldown:float=10.,invalid:bool=False)->None:
+        s.cooldown_until=max(s.cooldown_until,time.monotonic()+cooldown);s.invalid=s.invalid or invalid
     def status(self)->dict:
         now=time.monotonic()
         return {'size':len(self.states),'real_keys':sum(not s.placeholder for s in self.states),'cooldown_seconds':max(0,round(self.global_until-now,1)), 'keys':[{'id':s.id,'placeholder':s.placeholder,'active':not s.placeholder and not s.invalid and max(s.cooldown_until,self.global_until)<=now,'requests':s.calls,'latency_ms':s.latency_ms} for s in self.states]}
