@@ -99,7 +99,7 @@ The Python 3.13 candidate stack uses ORT-GPU 1.22, torch 2.7.1 / torchvision 0.2
 
 ## Validation status
 
-- **71 local unit/contract tests pass** for the current repository. Earlier GPU validation snapshots passed 51 remote tests; live deployment runs its own bundled contract suite before startup.
+- **76 local unit/contract tests pass** for the current repository. Earlier GPU validation snapshots passed 51 remote tests; live deployment runs its own bundled contract suite before startup.
 - Actual CPU OCR baseline: **902.58 ms p50**, **989.15 ms p95**, 20 uncached synthetic-frame measurements. Not a GPU result.
 - Terminal CTC ArgMax/ReduceMax matched the original recognizer's IDs and scores in a CPU numerical equivalence test.
 - Actual dual-T4 TensorRT configuration: **29.03 ms warm p50 / 31.13 ms p95**,20 uncached synthetic measurements; cold preparation/warmup **722.76 seconds**, first encoded frame **1397.58 ms**. Three cached engines were observed.
@@ -126,3 +126,7 @@ See [benchmark methodology](docs/BENCHMARKING.md) and [sanitized evidence](evide
 ## License and dependencies
 
 Original project code is [MIT licensed](LICENSE). Third-party models, packages, GPU runtimes and hosted APIs have their own terms; they are not relicensed by this repository. No weights or credentials are committed. See [third-party notices](THIRD_PARTY_NOTICES.md).
+
+### Native pixel-coordinate clarification
+
+The current source serializer emits explicit `pixel_x/pixel_y` text centers alongside separately named `norm_x/norm_y` values. Text centers are not inferred controls or guaranteed click targets. This addresses observed normalized-versus-native confusion in an experimental XeroKratos integration. The previously launched session still uses its bundled source; the integration can apply this serializer to real `/v1/ocr` results client-side without rebuilding GPU engines. Source changes alone do not hot-patch a running Kaggle process.
