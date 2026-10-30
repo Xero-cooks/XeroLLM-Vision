@@ -37,7 +37,7 @@ def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
         binary=root/'cloudflared';data=urllib.request.urlopen(cloudflared['url'],timeout=60).read()
         if hashlib.sha256(data).hexdigest()!=cloudflared['sha256']:raise RuntimeError('tunnel_binary_hash_mismatch')
         binary.write_bytes(data);binary.chmod(0o700)
-        env=os.environ.copy();env.update(GATEWAY_TOKEN=runtime['gateway_token'],GATEWAY_ADMIN_TOKEN=runtime['admin_token'],INCEPTION_API_KEYS=','.join(runtime['keys']),OCR_BACKEND='gpu',ENABLE_TENSORRT='true',TRT_BUILDER_OPT_LEVEL='1',KEY_RATE_LIMIT_SCOPE='key')
+        env=os.environ.copy();env.update(GATEWAY_TOKEN=runtime['gateway_token'],GATEWAY_ADMIN_TOKEN=runtime['admin_token'],INCEPTION_API_KEYS=','.join(runtime['keys']),OCR_BACKEND='gpu',ENABLE_TENSORRT='true',TRT_BUILDER_OPT_LEVEL='1',KEY_RATE_LIMIT_SCOPE='key',GATEWAY_ACTIVITY_FILE=str(root/'workload.activity'))
         def spawn(command,filename,child_env):
             f=open(filename,'w');logs.append(f);p=subprocess.Popen(command,env=child_env,stdout=f,stderr=f);processes.append(p);return p
         report('preparing_tensorrt_engines')
@@ -98,10 +98,16 @@ def run(runtime:dict,broker_url:str,session_seconds:int,cloudflared:dict)->None:
             if client.get(public_url+'/v1/models').status_code!=401:raise RuntimeError('public_auth_not_enforced')
             end=time.time()+max(300,min(session_seconds,3600))
             report('ready',public_url=public_url,backend=state['ocr']['backend'],gpu_count=state['ocr']['gpu_count'],session_end_unix=end,provider_real_keys=state['pool']['real_keys'],completion_tokens=real.json().get('usage',{}).get('completion_tokens',0),upstream_attempts=int(real.headers.get('x-upstream-attempts','0')))
+            activity=root/'workload.activity'
+            activity.touch(mode=0o600,exist_ok=True)
+            idle_seconds=600
             while time.time()<end:
                 if any(p.poll() is not None for p in processes):raise RuntimeError('serving_process_exited')
-                time.sleep(min(20,max(0,end-time.time())))
-            report('session_expired',public_url=public_url)
+                if time.time()-activity.stat().st_mtime>=idle_seconds:
+                    report('idle_shutdown',public_url=public_url)
+                    break
+                time.sleep(min(10,max(0,end-time.time())))
+            else:report('session_expired',public_url=public_url)
     except Exception as error:
         # Exception text can contain credentials/URLs, so report only class and safe runtime codes.
         safe=str(error) if isinstance(error,RuntimeError) and re.fullmatch('[a-z_]+',str(error)) else type(error).__name__

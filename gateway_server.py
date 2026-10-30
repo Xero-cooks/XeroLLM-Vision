@@ -1,5 +1,5 @@
 from __future__ import annotations
-import asyncio,contextlib,json,math,secrets,time,uuid
+import asyncio,contextlib,json,math,secrets,time,uuid,os,pathlib
 from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI,Request,HTTPException
@@ -48,7 +48,22 @@ def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->Fast
                 if len(body)+len(chunk)>cfg.max_body_bytes:return JSONResponse({'error':{'message':'request too large'}},status_code=413)
                 body.extend(chunk)
             request._body=bytes(body)
-        return await call_next(request)
+        # Health polling is deliberately NOT workload: it must not burn GPU quota.
+        activity=os.getenv('GATEWAY_ACTIVITY_FILE','')
+        workload=bool(activity and request.url.path in ('/v1/chat/completions','/v1/ocr'))
+        def touch():
+            if workload:pathlib.Path(activity).touch(mode=0o600,exist_ok=True)
+        touch()
+        response=await call_next(request)
+        if workload and hasattr(response,'body_iterator'):
+            iterator=response.body_iterator
+            async def observed_body():
+                try:
+                    async for chunk in iterator:
+                        touch();yield chunk
+                finally:touch()
+            response.body_iterator=observed_body()
+        return response
     def auth(request:Request,admin:bool=False):
         secret=cfg.admin_token if admin else cfg.gateway_token
         if not secret:raise HTTPException(503,'authentication is not configured')
