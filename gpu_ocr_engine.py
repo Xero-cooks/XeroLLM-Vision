@@ -113,11 +113,12 @@ class DualT4UltrafastOCREncoder:
     def _decode(self,blob:bytes):
         # PIL reads dimensions/header only on GPU path; no full CPU decode there.
         with Image.open(io.BytesIO(blob)) as im:
-            w,h=im.size;fmt=im.format
+            w,h=im.size;fmt=im.format;mode=im.mode
             if w*h>self.cfg.max_pixels or min(w,h)<16:raise ValueError('image dimensions outside limits')
             if fmt not in ('JPEG','PNG','WEBP'):raise ValueError('unsupported image format')
             if not self.torch:return np.asarray(im.convert('RGB'))[:,:,::-1].copy(),w,h
         if fmt!='JPEG':raise ValueError('strict GPU decode supports JPEG only; convert PNG client-side or use explicit CPU staging')
+        if mode not in {'RGB','L'}:raise ValueError('strict GPU JPEG decode requires RGB or grayscale; convert CMYK client-side')
         import torchvision.io as tv
         tensor=tv.decode_jpeg(self.torch.frombuffer(bytearray(blob),dtype=self.torch.uint8),mode=tv.ImageReadMode.RGB,device='cuda:0')
         return tensor.flip(0),w,h
