@@ -1,0 +1,24 @@
+{
+  "source": "Authenticated live Kaggle dual Tesla T4 gateway; /v1/ocr",
+  "grain": "one 1920x1080 synthetic UI image request after three warmups; unique cache namespace per measured request",
+  "samples": 20,
+  "warmups": 3,
+  "server_ocr_p50_ms": 30.567982500087965,
+  "server_ocr_p95_ms": 32.238680000091335,
+  "all_expected_navigation_labels_found": true,
+  "cache_hit_ratio_all_zero": true,
+  "controller_wall_p50_ms": 122.30811050005741,
+  "limitations": [
+    "Synthetic UI fixtures, not production poster accuracy benchmark.",
+    "Server OCR timing excludes controller transport and LLM inference.",
+    "No generation tokens/sec claim follows from OCR latency."
+  ],
+  "comparison_plan": [
+    {
+      "question": "Current warm uncached server OCR latency",
+      "unit": "ms/request",
+      "disposition": "prose",
+      "reason": "One headline median; no comparative chart or trend requested."
+    }
+  ]
+}
