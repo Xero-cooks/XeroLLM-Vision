@@ -6,7 +6,7 @@ from fastapi import FastAPI,Request,HTTPException
 from fastapi.responses import JSONResponse,StreamingResponse
 from api_pool import InceptionKeyPool,PoolUnavailable
 from config import Settings
-from payload_transformer import transform,image_bytes
+from payload_transformer import transform,image_bytes,gpu_admitted
 
 def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->FastAPI:
     cfg=cfg or Settings()
@@ -99,6 +99,7 @@ def create_app(cfg:Settings|None=None,engine=None,upstream_transport=None)->Fast
         async with app.state.limit:
             try:
                 blob=await image_bytes(url,app.state.client,cfg)
+                blob=gpu_admitted(blob,engine)
                 fid=j.get('frame_id');ts=j.get('captured_at')
                 if any(v is not None and (not isinstance(v,str) or len(v)>128) for v in (fid,ts)):raise ValueError('invalid frame metadata')
                 frame=await asyncio.to_thread(engine.encode,blob,fid,ts,request.headers.get('X-UI-Resolution')=='high',request.headers.get('X-Session-ID','default')[:128])

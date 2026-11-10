@@ -1,8 +1,24 @@
 from __future__ import annotations
-import asyncio,base64,binascii,copy,hashlib,ipaddress,re,socket,time
+import asyncio,base64,binascii,copy,hashlib,io,ipaddress,re,socket,time
 from urllib.parse import urlsplit,urlunsplit
+from PIL import Image
 import httpx
 from config import Settings
+
+
+def gpu_admitted(blob:bytes,engine)->bytes:
+    '''Strict GPU decode is JPEG-only (nvJPEG has no PNG path). Transcode PNG/WEBP at the
+    payload boundary so a screenshot does not have to be re-encoded by the caller. CPU
+    staging already accepts every format, so those bytes pass through untouched.'''
+    if getattr(engine,'torch',None) is None:return blob
+    try:
+        with Image.open(io.BytesIO(blob)) as im:
+            if im.format=='JPEG':return blob
+            buffer=io.BytesIO();im.convert('RGB').save(buffer,format='JPEG',quality=95)
+            return buffer.getvalue()
+    except (OSError,ValueError):return blob  # let the engine report the real decode error
+
+
 async def image_bytes(url:str,client:httpx.AsyncClient,cfg:Settings)->bytes:
     if url.startswith('data:'):
         m=re.fullmatch(r'data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=\r\n]+)',url)
@@ -56,7 +72,7 @@ async def transform(payload:dict,engine,client:httpx.AsyncClient,cfg:Settings,*,
     if len(jobs)>cfg.max_images:raise ValueError('too many images')
     async def process(i,url):
         blob=await image_bytes(url,client,cfg)
-        return await asyncio.to_thread(engine.encode,blob,f'img_{i+1}',None,high,namespace)
+        return await asyncio.to_thread(engine.encode,gpu_admitted(blob,engine),f'img_{i+1}',None,high,namespace)
     # Bounded by max_images; engine serializes frame inference while shards run concurrently.
     frames=await asyncio.gather(*(process(i,u) for i,u in enumerate(jobs)))
     for (mi,ci),frame in zip(positions,frames):
